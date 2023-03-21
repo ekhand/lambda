@@ -78,9 +78,10 @@ fi
 
 # set bucket configuration
 echo "configuring s3 notifications..."
+sed "s/<FUNCTIONNAME>/$funcname/g" s3_notif_template.json > build/s3_notif_config.json # create notif link
 awslocal --endpoint-url=http://localhost:4566 \
 s3api put-bucket-notification-configuration --bucket $funcname \
---notification-configuration file://s3_notif_config.json
+--notification-configuration file://build/s3_notif_config.json
 
 # print startup logs
 if [ -d $funcname.log ]; then
