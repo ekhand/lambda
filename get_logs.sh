@@ -1,5 +1,6 @@
-#!/bin/bash
+#!/bin/sh
 
+funcname="dts"
 while getopts f: flag
 do
     case "${flag}" in
