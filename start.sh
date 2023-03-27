@@ -14,6 +14,7 @@ do
         ;;
     h)
         echo "use [-n] to clear and start a new s3 bucket"
+        echo "use [-f] <function_name> to specify name for lambda/s3"
         exit 1
         ;;
   esac
@@ -47,11 +48,11 @@ if [[ "$running" == *"\"$funcname\""* ]]; then
 fi
 
 # clear existing lambda logs
-awslocal --endpoint-url=http://localhost:4566 logs delete-log-group --log-group-name="/aws/lambda/$funcname"
+awslocal logs delete-log-group --log-group-name="/aws/lambda/$funcname"
 
 # launch updated lambda
 echo "launching updated $funcname lambda..."
-awslocal --endpoint-url=http://localhost:4566 \
+awslocal \
 lambda create-function --function-name $funcname \
 --zip-file fileb://$dir/build/function.zip \
 --handler main --runtime go1.x \
@@ -73,7 +74,7 @@ fi
 # create new bucket if needed
 if $creates3; then
     echo "creating s3 bucket..."
-    awslocal --endpoint-url=http://localhost:4566 s3 mb s3://$funcname
+    awslocal --endpoint-url=http://localhost:4566 s3 mb --region=us-east-1 s3://$funcname
 fi
 
 # set bucket configuration
