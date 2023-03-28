@@ -20,6 +20,20 @@ var (
 	downloader *s3manager.Downloader
 )
 
+// main function for startup
+func main() {
+	// create s3 session
+	err := setupS3()
+	if err != nil {
+		log.Printf("COULD NOT START LAMBDA FUNC: %v", err)
+		os.Exit(1)
+	}
+
+	// Make the handler available for Remote Procedure Call by AWS Lambda
+	lambda.Start(handler)
+}
+
+// lambda event handler
 func handler(ctx context.Context, s3Event events.S3Event) {
 	for _, record := range s3Event.Records {
 		item := record.S3
@@ -39,8 +53,11 @@ func handler(ctx context.Context, s3Event events.S3Event) {
 	}
 }
 
-func main() {
-	// create aws session
+// HELPER FUNCS
+
+// connects to AWS and creates an S3 downloader
+// config params are temporary for localstack testing and development purposes
+func setupS3() error {
 	sess, err := session.NewSessionWithOptions(
 		session.Options{
 			Config: aws.Config{
@@ -52,13 +69,10 @@ func main() {
 		},
 	)
 	if err != nil {
-		log.Printf("COULD NOT START SESSION")
-		os.Exit(1)
+		return fmt.Errorf("failed to connect to s3: %w", err)
 	}
 
-	// create downloader for events
+	// create downloader for events (GLOBAL)
 	downloader = s3manager.NewDownloader(sess)
-
-	// Make the handler available for Remote Procedure Call by AWS Lambda
-	lambda.Start(handler)
+	return nil
 }
