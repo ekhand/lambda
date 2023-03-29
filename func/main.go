@@ -48,7 +48,7 @@ func handler(ctx context.Context, s3Event events.S3Event) {
 			log.Printf("[ERROR] unable to download %s from %s: %v", item.Object.Key, item.Bucket.Name, err)
 		} else {
 			log.Printf("Downloaded %v bytes from %s", len(buf.Bytes()), item.Object.Key)
-			log.Printf("Body: \n\t%v", string(buf.Bytes()))
+			log.Printf("Body: \n%v", string(buf.Bytes()))
 		}
 	}
 }
